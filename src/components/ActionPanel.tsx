@@ -12,6 +12,7 @@ import { defineActions } from "../uniqueValues";
 function ActionPanel() {
   const [activeWidget, setActiveWidget] = useState<any>(null);
   const [nextWidget, setNextWidget] = useState<any>(null);
+  const shellPanel: any = document.getElementById("left-shell-panel");
 
   useEffect(() => {
     if (activeWidget) {
@@ -19,6 +20,7 @@ function ActionPanel() {
         `[data-panel-id=${activeWidget}]`,
       );
       actionActiveWidget.hidden = true;
+      shellPanel.collapsed = true;
     }
 
     if (nextWidget !== activeWidget) {
@@ -26,6 +28,7 @@ function ActionPanel() {
         `[data-panel-id=${nextWidget}]`,
       );
       actionNextWidget.hidden = false;
+      shellPanel.collapsed = false;
     }
   });
 

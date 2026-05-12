@@ -12,6 +12,7 @@ import MapDisplay from "./components/MapDisplay";
 import ActionPanel from "./components/ActionPanel";
 import Header from "./components/Header";
 import Chart from "./components/Chart";
+import { MyContext } from "./contexts/MyContext";
 
 export function App(): React.JSX.Element {
   const [loggedInState, setLoggedInState] = useState<boolean>(false);
@@ -45,6 +46,11 @@ export function App(): React.JSX.Element {
     loginAndLoadPortal();
   }, []);
 
+  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
+  const updateChartPanelwidth = (newWidth: any) => {
+    setChartPanelwidth(newWidth);
+  };
+
   return (
     <>
       {loggedInState === true && (
@@ -52,10 +58,12 @@ export function App(): React.JSX.Element {
           <calcite-shell
             style={{ scrollbarWidth: "thin", scrollbarColor: "#888 #555" }}
           >
-            <ActionPanel />
-            <MapDisplay />
-            <Chart />
-            <Header />
+            <MyContext value={{ chartPanelwidth, updateChartPanelwidth }}>
+              <ActionPanel />
+              <MapDisplay />
+              <Chart />
+              <Header />
+            </MyContext>
           </calcite-shell>
         </div>
       )}

@@ -11,31 +11,31 @@ import TextSymbol3DLayer from "@arcgis/core/symbols/TextSymbol3DLayer";
 import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D.js";
 import IconSymbol3DLayer from "@arcgis/core/symbols/IconSymbol3DLayer.js";
 import LineCallout3D from "@arcgis/core/symbols/callouts/LineCallout3D";
-// import QueryExpressionLayers from "query-layers-expression";
+import QueryExpressionLayers from "query-layers-expression";
 
-// export const queryc = new QueryExpressionLayers(
-//   undefined,
-//   undefined,
-//   undefined,
-//   undefined,
-//   "string",
-//   0,
-//   undefined,
-//   undefined,
-//   undefined,
-// );
+export const queryc = new QueryExpressionLayers(
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  "string",
+  0,
+  undefined,
+  undefined,
+  undefined,
+);
 
-// export const queryc2 = new QueryExpressionLayers(
-//   undefined,
-//   undefined,
-//   undefined,
-//   undefined,
-//   "string",
-//   0,
-//   undefined,
-//   undefined,
-//   undefined,
-// );
+export const queryc2 = new QueryExpressionLayers(
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  "string",
+  0,
+  undefined,
+  undefined,
+  undefined,
+);
 
 /* Standalone table for Dates */
 export const dateTable = new FeatureLayer({

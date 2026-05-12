@@ -112,7 +112,8 @@ export function clickSeries({
     queryc.chartCategory = typeSelected;
     queryc.chartCategoryField = chartCategoryFieldScene;
     queryc.chartCategoryType = "number";
-    queryc.status = statusStatename === "normal" ? 2 : 3;
+    queryc.status =
+      statusStatename === "nodata" ? 1 : statusStatename === "normal" ? 2 : 3;
     queryc.statusField = statusField;
 
     for (const layer of layers) {
@@ -184,7 +185,9 @@ export function makeSeries({
       fill:
         statusStatename === "exceeded"
           ? am5.color(seriesStatusColor[0])
-          : am5.color(seriesStatusColor[1]),
+          : statusStatename === "normal"
+            ? am5.color(seriesStatusColor[1])
+            : am5.color(seriesStatusColor[2]),
       stroke: am5.color(strokeColor),
     }),
   );
@@ -207,7 +210,8 @@ export function makeSeries({
             ? ""
             : "{valueXTotalPercent.formatNumber('#.')}%", //"{valueX}",
         fill: root.interfaceColors.get("alternativeText"),
-        opacity: statusStatename === "normal" ? 0 : 1,
+        opacity:
+          statusStatename === "normal" || statusStatename === "nodata" ? 0 : 1,
         fontSize: new_axisFontSize,
         centerY: am5.p50,
         centerX: am5.p50,

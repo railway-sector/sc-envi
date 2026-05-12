@@ -48,12 +48,13 @@ export async function chartDataQuery({
   //--- Query features using statistics definitions
   const qStats = layers?.queryFeatures(query).then((response: any) => {
     const stats = response.features[0].attributes;
-    const incomp = stats[compile[0].outStatisticFieldName];
-    const comp = stats[compile[1].outStatisticFieldName];
-    const total = incomp + comp;
+    const nodata = stats[compile[0].outStatisticFieldName];
+    const normal = stats[compile[1].outStatisticFieldName];
+    const exceeded = stats[compile[2].outStatisticFieldName];
+    const total = nodata + normal + exceeded;
 
     // return [incomp, comp, ongoing, delayed, total];
-    return [incomp, comp, total];
+    return [nodata, normal, exceeded, total];
   });
   return qStats;
 }
@@ -73,6 +74,7 @@ export async function chartDataStackColumns({
     const promises = chartCategoryTypes.map(async (type: any) => {
       let total_exceeded = 0;
       let total_normal = 0;
+      let total_nodata = 0;
 
       // 2. Use Promise.all to wait for all statuses
       await Promise.all(
@@ -97,6 +99,7 @@ export async function chartDataStackColumns({
             const response = await layer.queryFeatures(query);
             const stats = response.features[0]?.attributes;
             if (stats) {
+              if (status === 1) total_nodata += stats["temp"] || 0;
               if (status === 2) total_normal += stats["temp"] || 0;
               if (status === 3) total_exceeded += stats["temp"] || 0;
             }
@@ -109,6 +112,7 @@ export async function chartDataStackColumns({
         category: type.category,
         exceeded: total_exceeded,
         normal: total_normal,
+        nodata: total_nodata,
         icon: type.icon,
       };
     });
@@ -120,7 +124,7 @@ export async function chartDataStackColumns({
       0,
     );
     const total_all = results.reduce(
-      (sum: any, item: any) => sum + item.exceeded + item.normal, // + item.ongoing + item.delayed,
+      (sum: any, item: any) => sum + item.exceeded + item.normal + item.nodata, // + item.ongoing + item.delayed,
       0,
     );
     return [results, total_all, total_exceeded];

@@ -6,9 +6,9 @@ export const statusField = "Status";
 
 //------
 export type TypeFieldType = "number" | "string";
-export type StatusTypenamesType = "Normal" | "Exceeded";
+export type StatusTypenamesType = "No Data" | "Normal" | "Exceeded";
 
-export type StatusStateType = "exceeded" | "normal";
+export type StatusStateType = "exceeded" | "normal" | "nodata";
 export const monitoringCategoryLabels = [
   "Noise",
   "Vibration",
@@ -19,7 +19,7 @@ export const monitoringCategoryLabels = [
 ];
 
 export const monitoringStatusValues = [1, 2, 3, 4, 5, 6];
-export const monitoringStatusColor = ["#FF0000", "#000000"];
+export const monitoringStatusColor = ["#FF0000", "#000000", "#666363"];
 export const icons = [
   "https://EijiGorilla.github.io/Symbols/Noise_Logo.png",
   "https://EijiGorilla.github.io/Symbols/Vibration_Logo.png",

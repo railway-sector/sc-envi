@@ -272,7 +272,7 @@ const monitorStatusSymbolRenderer = new UniqueValueRenderer({
       symbol: getUniqueValueSymbol(
         "https://EijiGorilla.github.io/Symbols/No_Data_textLogo.png",
         "#D13470",
-        20,
+        60,
       ),
     },
     {

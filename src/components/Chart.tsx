@@ -12,6 +12,7 @@ import {
   chartCategoryField,
   monitoringStatusColor,
   monitoringTypes,
+  statusArray,
   statusField,
 } from "../uniqueValues";
 import { chartRenderer } from "../ChartRenderer";
@@ -129,7 +130,7 @@ const Chart = () => {
       chartCategoryFieldScene: chartCategoryField,
       statusTypename: ["Exceeded", "Normal"],
       statusStatename: ["exceeded", "normal"],
-      statusStateValue: [3, 2],
+      statusArray: statusArray,
       statusField: statusField,
       seriesStatusColor: monitoringStatusColor,
       strokeColor: chartBorderLineColor,

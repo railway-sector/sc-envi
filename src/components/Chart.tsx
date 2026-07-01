@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { use, useEffect, useRef, useState } from "react";
-import { monitorPointLayer } from "../layers";
+import { use, useEffect, useRef } from "react";
+import { chartstack, monitorPointLayer } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import am5themes_Responsive from "@amcharts/amcharts5/themes/Responsive";
 import { thousands_separators } from "../Query";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
-import { chartDataStackColumns } from "../ChartDataGenerator";
 import {
   chartCategoryField,
+  icons,
   monitoringStatusColor,
   monitoringTypes,
   statusArray,
@@ -17,42 +15,58 @@ import {
 } from "../uniqueValues";
 import { chartRenderer } from "../ChartRenderer";
 import { MyContext } from "../contexts/MyContext";
-
-// Dispose function
-function maybeDisposeRoot(divId: any) {
-  am5.array.each(am5.registry.rootElements, function (root) {
-    if (root.dom.id === divId) {
-      root.dispose();
-    }
-  });
-}
+import { useQuery } from "@tanstack/react-query";
+import { legendSetter, rootSetter } from "../chartSetter";
+import type { ChartResponse } from "../interfaceKeys";
 
 const Chart = () => {
   const { updateChartPanelwidth, chartPanelwidth } = use(MyContext);
   const arcgisScene = document.querySelector("arcgis-scene") as ArcgisScene;
   const legendRef = useRef<unknown | any | undefined>({});
   const chartRef = useRef<unknown | any | undefined>({});
-  const [chartData, setChartData] = useState<any>([]);
-  const [totalNumber, setTotalNumber] = useState<number>(0);
-  const [totalExceeded, setTotalExceeded] = useState<number>(0);
-
   const chartID = "monitoring-bar";
 
-  useEffect(() => {
-    chartDataStackColumns({
-      qChart: undefined,
-      layers: [monitorPointLayer],
-      chartCategoryTypes: monitoringTypes,
-      chartCategoryField: chartCategoryField,
-      chartCategoryValueType: "number",
-      statusState: [2, 3],
-      statusField: statusField,
-    }).then((result: any) => {
-      setChartData(result[0]);
-      setTotalNumber(result[1]);
-      setTotalExceeded(result[2]);
-    });
-  }, []);
+  const { data } = useQuery<ChartResponse | any>({
+    queryKey: [
+      statusField,
+      monitorPointLayer,
+      chartCategoryField,
+      monitoringTypes,
+    ],
+    queryFn: async () => {
+      chartstack.categoryTypeField = chartCategoryField;
+      chartstack.categoryTypes = monitoringTypes;
+      chartstack.layers = [monitorPointLayer];
+      chartstack.statusState = [1, 2, 3, 4];
+      chartstack.statusField = statusField;
+      chartstack.layers = [monitorPointLayer];
+      chartstack.qChart = undefined;
+      const chartData = await chartstack.chartDataStackColumns();
+
+      let totale = 0;
+      const arr = chartData[0].map(
+        (item: any, index: any) => (
+          (totale += item.delayed),
+          {
+            category: item.category,
+            exceeded: item.delayed,
+            normal: item.ongoing,
+            nodata: item.incomp,
+            icon: icons[index],
+          }
+        ),
+      );
+
+      return {
+        chartData: arr || [],
+        totaln: chartData[1] || 0,
+        totale: totale,
+      };
+    },
+  });
+  const chartData = data?.chartData || [];
+  const totaln = data?.totaln || 0;
+  const totale = data?.totale || 0;
 
   // Define parameters
   const marginTop = 0;
@@ -78,19 +92,7 @@ const Chart = () => {
   const new_imageSize = chartPanelwidth * 0.053;
 
   useEffect(() => {
-    maybeDisposeRoot(chartID);
-
-    const root = am5.Root.new(chartID);
-    root.container.children.clear();
-    root._logo?.dispose();
-
-    // Set themesf
-    // https://www.amcharts.com/docs/v5/concepts/themes/
-    root.setThemes([
-      am5themes_Animated.new(root),
-      am5themes_Responsive.new(root),
-    ]);
-
+    const root = rootSetter({ chartID: chartID });
     const chart = root.container.children.push(
       am5xy.XYChart.new(root, {
         panX: false,
@@ -110,15 +112,16 @@ const Chart = () => {
     );
     chartRef.current = chart;
 
-    const legend = chart.children.push(
-      am5.Legend.new(root, {
-        centerX: am5.p50,
-        centerY: am5.percent(50),
-        x: am5.percent(60),
-        y: am5.percent(97),
-        marginTop: 20,
-      }),
-    );
+    const legend = legendSetter({
+      chart: chart,
+      root: root,
+      centerX: 50,
+      centerY: 50,
+      x: 60,
+      y: 97,
+      marginTop: 20,
+      layout: root.horizontalLayout,
+    });
     legendRef.current = legend;
 
     chartRenderer({
@@ -179,7 +182,7 @@ const Chart = () => {
         >
           <img
             src={
-              totalExceeded > 0
+              totale > 0
                 ? "https://EijiGorilla.github.io/Symbols/3D_Web_Style/Warning_Symbol.svg"
                 : "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png"
             }
@@ -207,10 +210,10 @@ const Chart = () => {
                 margin: "auto",
               }}
             >
-              {thousands_separators(totalExceeded)}
+              {thousands_separators(totale)}
             </dd>
             <div style={{ fontSize: `${new_valueSize}*0.5px` }}>
-              ({thousands_separators(totalNumber)})
+              ({thousands_separators(totaln)})
             </div>
           </dl>
         </div>

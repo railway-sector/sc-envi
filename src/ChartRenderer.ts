@@ -109,8 +109,7 @@ export function clickSeries({
       (emp: any) => emp.category === categorySelected,
     );
     const typeSelected = find?.value;
-    queryc.qValues = [undefined];
-    queryc.qFields = [undefined];
+
     queryc.chartCategory = typeSelected;
     queryc.chartCategoryField = chartCategoryFieldScene;
     queryc.chartCategoryType = "number";

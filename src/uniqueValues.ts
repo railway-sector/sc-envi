@@ -8,7 +8,12 @@ export const statusField = "Status";
 export type TypeFieldType = "number" | "string";
 export type StatusTypenamesType = "No Data" | "Normal" | "Exceeded";
 
-export type StatusStateType = "exceeded" | "normal" | "nodata";
+export type StatusStateType =
+  | "exceeded"
+  | "normal"
+  | "nodata"
+  | "delayed"
+  | "ongoing";
 export const monitoringCategoryLabels = [
   "Noise",
   "Vibration",
@@ -35,6 +40,7 @@ export const monitoringTypes = monitoringCategoryLabels.map(
       category: label,
       value: monitoringStatusValues[index],
       icon: icons[index],
+      color: monitoringStatusColor[index],
     });
   },
 );

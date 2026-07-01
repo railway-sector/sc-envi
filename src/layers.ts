@@ -12,10 +12,20 @@ import PointSymbol3D from "@arcgis/core/symbols/PointSymbol3D.js";
 import IconSymbol3DLayer from "@arcgis/core/symbols/IconSymbol3DLayer.js";
 import LineCallout3D from "@arcgis/core/symbols/callouts/LineCallout3D";
 import QueryExpressionLayers from "query-layers-expression";
+import ChartStackColumns from "chart-stack-column";
+
+export const chartstack = new ChartStackColumns(
+  undefined, // qChart
+  undefined, // categoryTypes
+  undefined, // categoryTypeField
+  undefined, // layers
+  undefined, // status field
+  undefined, // statusState
+);
 
 export const queryc = new QueryExpressionLayers(
-  undefined,
-  undefined,
+  [undefined],
+  [undefined],
   undefined,
   undefined,
   "string",
@@ -26,8 +36,8 @@ export const queryc = new QueryExpressionLayers(
 );
 
 export const queryc2 = new QueryExpressionLayers(
-  undefined,
-  undefined,
+  [undefined],
+  [undefined],
   undefined,
   undefined,
   "string",
@@ -361,7 +371,7 @@ export const monitorPointLayer = new FeatureLayer({
     ],
   },
 });
-monitorPointLayer.listMode = "hide";
+// monitorPointLayer.listMode = "hide";
 
 export const alignmentGroupLayer = new GroupLayer({
   title: "Alignment",

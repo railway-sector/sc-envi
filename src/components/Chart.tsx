@@ -3,7 +3,7 @@ import { use, useEffect, useRef } from "react";
 import { chartstack, monitorPointLayer } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import { thousands_separators } from "../Query";
+import { thousands_separators } from "../query";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
 import {
   chartCategoryField,
@@ -13,7 +13,7 @@ import {
   statusArray,
   statusField,
 } from "../uniqueValues";
-import { chartRenderer } from "../ChartRenderer";
+import { chartRenderer } from "../chartRenderer";
 import { MyContext } from "../contexts/MyContext";
 import { useQuery } from "@tanstack/react-query";
 import { legendSetter, rootSetter } from "../chartSetter";

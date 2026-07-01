@@ -10,9 +10,11 @@ import {
   monitorPointLayer,
   stationLayer,
 } from "../layers";
+import { useState } from "react";
 
 function MapDisplay() {
   const arcgisScene = document.querySelector("arcgis-scene");
+  const [_mapView, setMapView] = useState<any>(null);
 
   arcgisScene?.viewOnReady(() => {
     arcgisScene?.map?.add(alignmentGroupLayer);
@@ -29,6 +31,9 @@ function MapDisplay() {
       viewingMode="local"
       zoom={12}
       center="121.005, 14.56"
+      onarcgisViewReadyChange={(event: any) => {
+        setMapView(event.target.id);
+      }}
     >
       {/* <arcgis-zoom position="top-right"></arcgis-zoom> */}
     </arcgis-scene>

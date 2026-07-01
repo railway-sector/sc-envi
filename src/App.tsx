@@ -9,7 +9,6 @@ import MapDisplay from "./components/MapDisplay";
 import ActionPanel from "./components/ActionPanel";
 import Header from "./components/Header";
 import Chart from "./components/Chart";
-import { MyContext } from "./contexts/MyContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authenticate } from "./autho";
 
@@ -22,11 +21,6 @@ export function App(): React.JSX.Element {
     authenticate(setLoggedInState, "4uy6bDANkQ3MsHXQ");
   }, []);
 
-  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
-  const updateChartPanelwidth = (newWidth: any) => {
-    setChartPanelwidth(newWidth);
-  };
-
   return (
     <>
       {loggedInState === true && (
@@ -34,14 +28,12 @@ export function App(): React.JSX.Element {
           <calcite-shell
             style={{ scrollbarWidth: "thin", scrollbarColor: "#888 #555" }}
           >
-            <MyContext value={{ chartPanelwidth, updateChartPanelwidth }}>
-              <QueryClientProvider client={queryClient}>
-                <ActionPanel />
-                <MapDisplay />
-                <Chart />
-                <Header />
-              </QueryClientProvider>
-            </MyContext>
+            <QueryClientProvider client={queryClient}>
+              <ActionPanel />
+              <MapDisplay />
+              <Chart />
+              <Header />
+            </QueryClientProvider>
           </calcite-shell>
         </div>
       )}

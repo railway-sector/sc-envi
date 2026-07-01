@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { use, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { chartstack, monitorPointLayer } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
@@ -14,13 +14,12 @@ import {
   statusField,
 } from "../uniqueValues";
 import { chartRenderer } from "../chartRenderer";
-import { MyContext } from "../contexts/MyContext";
 import { useQuery } from "@tanstack/react-query";
 import { legendSetter, rootSetter } from "../chartSetter";
 import type { ChartResponse } from "../interfaceKeys";
 
 const Chart = () => {
-  const { updateChartPanelwidth, chartPanelwidth } = use(MyContext);
+  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
   const arcgisScene = document.querySelector("arcgis-scene") as ArcgisScene;
   const legendRef = useRef<unknown | any | undefined>({});
   const chartRef = useRef<unknown | any | undefined>({});
@@ -144,7 +143,7 @@ const Chart = () => {
       chartIconPositionX: chartIconPositionX,
       chartPaddingRightIconLabel: chartPaddingRightIconLabel,
       legend: legend,
-      updateChartPanelwidth: updateChartPanelwidth,
+      updateChartPanelwidth: setChartPanelwidth,
     });
 
     chart.appear(1000, 100);

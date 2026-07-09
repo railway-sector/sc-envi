@@ -149,6 +149,7 @@ const Chart = () => {
       chartPaddingRightIconLabel,
       legend,
       setChartPanelwidth,
+      undefined,
     );
     crender.chartRendererColumn();
 

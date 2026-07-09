@@ -1,4 +1,20 @@
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { dateTable } from "./layers";
+
+interface layersRevitVisibilityType {
+  layers: [FeatureLayer, FeatureLayer?, FeatureLayer?, FeatureLayer?];
+}
+
+export const resetAllLayers = ({ layers }: layersRevitVisibilityType) => {
+  if (layers) {
+    layers.map((layer: any) => {
+      if (layer) {
+        layer.layer.definitionExpression = "1=1";
+        layer.layer.visible = true;
+      }
+    });
+  }
+};
 
 // Updat date
 export async function dateUpdate() {

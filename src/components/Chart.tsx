@@ -1,22 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { useEffect, useRef, useState } from "react";
-import { chartstack, monitorPointLayer } from "../layers";
+import { chartstack, monitorPointLayer, queryc } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { thousands_separators } from "../query";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
 import {
   chartCategoryField,
-  icons,
   monitoringStatusColor,
   monitoringTypes,
   statusArray,
   statusField,
 } from "../uniqueValues";
-import { chartRenderer } from "../chartRenderer";
 import { useQuery } from "@tanstack/react-query";
 import { legendSetter, rootSetter } from "../chartSetter";
 import type { ChartResponse } from "../interfaceKeys";
+import ChartStackColumnRender from "chart-stack-column-render";
 
 const Chart = () => {
   const [chartPanelwidth, setChartPanelwidth] = useState<any>();
@@ -43,15 +42,17 @@ const Chart = () => {
       const chartData = await chartstack.chartDataStackColumns();
 
       let totale = 0;
+
+      console.log(chartData);
       const arr = chartData[0].map(
-        (item: any, index: any) => (
+        (item: any) => (
           (totale += item.delayed),
           {
             category: item.category,
             exceeded: item.delayed,
             normal: item.ongoing,
             nodata: item.incomp,
-            icon: icons[index],
+            icon: item.icon,
           }
         ),
       );
@@ -123,28 +124,33 @@ const Chart = () => {
     });
     legendRef.current = legend;
 
-    chartRenderer({
-      root: root,
-      chart: chart,
-      data: chartData,
-      layers: [monitorPointLayer],
-      chartCategoryTypes: monitoringTypes,
-      chartCategoryFieldScene: chartCategoryField,
-      statusTypename: ["Exceeded", "Normal"],
-      statusStatename: ["exceeded", "normal"],
-      statusArray: statusArray,
-      statusField: statusField,
-      seriesStatusColor: monitoringStatusColor,
-      strokeColor: chartBorderLineColor,
-      strokeWidth: chartBorderLineWidth,
-      arcgisScene: arcgisScene,
-      new_chartIconSize: new_chartIconSize,
-      new_axisFontSize: new_axisFontSize,
-      chartIconPositionX: chartIconPositionX,
-      chartPaddingRightIconLabel: chartPaddingRightIconLabel,
-      legend: legend,
-      updateChartPanelwidth: setChartPanelwidth,
-    });
+    const crender = new ChartStackColumnRender(
+      false,
+      [monitorPointLayer],
+      root,
+      chart,
+      chartData,
+      undefined,
+      queryc,
+      monitoringTypes,
+      chartCategoryField,
+      ["Exceeded", "Normal"],
+      ["exceeded", "normal"],
+      statusArray,
+      statusField,
+      monitoringStatusColor,
+      chartBorderLineColor,
+      chartBorderLineWidth,
+      arcgisScene?.view,
+      undefined,
+      new_chartIconSize,
+      new_axisFontSize,
+      chartIconPositionX,
+      chartPaddingRightIconLabel,
+      legend,
+      setChartPanelwidth,
+    );
+    crender.chartRendererColumn();
 
     chart.appear(1000, 100);
 

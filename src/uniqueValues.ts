@@ -24,7 +24,6 @@ export const monitoringCategoryLabels = [
 ];
 
 export const monitoringStatusValues = [1, 2, 3, 4, 5, 6];
-export const monitoringStatusColor = ["#FF0000", "#000000", "#666363"];
 export const icons = [
   "https://EijiGorilla.github.io/Symbols/Noise_Logo.png",
   "https://EijiGorilla.github.io/Symbols/Vibration_Logo.png",
@@ -40,17 +39,18 @@ export const monitoringTypes = monitoringCategoryLabels.map(
       category: label,
       value: monitoringStatusValues[index],
       icon: icons[index],
-      color: monitoringStatusColor[index],
     });
   },
 );
 
 export const statusLabels = ["nodata", "normal", "exceeded"];
 export const statusValues = [1, 2, 3];
+export const monitoringStatusColor = ["#666363", "#000000", "#FF0000"];
 export const statusArray = statusLabels.map((status: any, index: any) => {
   return Object.assign({
     status: status,
     value: statusValues[index],
+    color: monitoringStatusColor[index],
   });
 });
 

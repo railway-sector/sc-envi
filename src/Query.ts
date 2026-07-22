@@ -1,6 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { dateTable } from "./layers";
+import QueryExpressionLayers from "query-layers-expression";
 
+//---------------------------------------------------------//
+//                 Add Layers to Map                      //
+//---------------------------------------------------------//
+export function addLayersToMap(map: any, layersList: any[]) {
+  layersList.forEach((layer: any) => {
+    map.add(layer);
+  });
+}
+
+//-----------------------------------------//
+//        Layer visibility                //
+//-----------------------------------------//
 interface layersRevitVisibilityType {
   layers: [FeatureLayer, FeatureLayer?, FeatureLayer?, FeatureLayer?];
 }
@@ -16,41 +30,141 @@ export const resetAllLayers = ({ layers }: layersRevitVisibilityType) => {
   }
 };
 
-// Updat date
-export async function dateUpdate() {
-  const monthList = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+//---------------------------------------------------------//
+//                Get as-of-date                           //
+//---------------------------------------------------------//
+export function yearMonthDay(date: Date) {
+  return {
+    year: date?.getFullYear() ?? 0,
+    month: date?.getMonth() + 1,
+    day: date?.getDate(),
+  };
+}
 
+export function toAsofdate(date: Date) {
+  //--- Return displayed date: (as of date)
+  const { year, day } = yearMonthDay(date);
+  const cmonth = date?.toLocaleString("en-US", { month: "long" });
+  return `${cmonth} ${day}, ${year}`;
+}
+
+export async function dateUpdate(category: string) {
+  //--- Only executed during an initial render
   const query = dateTable.createQuery();
-  query.where =
-    "project = 'SC'" + " AND " + "category = 'Environment Monitoring'";
+  query.where = `project = 'SC' AND category = '${category}'`;
 
-  return dateTable.queryFeatures(query).then((response: any) => {
-    const stats = response.features;
-    const dates = stats.map((result: any) => {
-      const date = new Date(result.attributes.date);
-      const year = date.getFullYear();
-      const month = monthList[date.getMonth()];
-      const day = date.getDate();
-      const final = year < 1990 ? "" : `${month} ${day}, ${year}`;
-      return final;
-    });
-    return dates;
+  const { features } = await dateTable.queryFeatures(query);
+  return features.map(({ attributes }: any) => {
+    const asofdate = toAsofdate(new Date(attributes.date));
+
+    return asofdate;
   });
 }
 
+//---------------------------------------------//
+//               Stack Columns                 //
+//---------------------------------------------//
+interface StackColumnChartDataType {
+  colchart: any;
+  qChart: any;
+  categoryTypes: any;
+  categoryTypeField: any;
+  layers: any;
+  statusField: any;
+  statusState: any;
+}
+
+export async function stackColumnChartData({
+  colchart,
+  qChart,
+  categoryTypes,
+  categoryTypeField,
+  layers,
+  statusField,
+  statusState,
+}: StackColumnChartDataType) {
+  Object.assign(colchart, {
+    qChart: qChart.queryExpression(),
+    categoryTypes,
+    categoryTypeField,
+    layers,
+    statusField,
+    statusState,
+  });
+
+  return await colchart.chartDataStackColumns();
+}
+
+type StatusTypeNamesType =
+  | "To be Constructed"
+  | "Under Construction"
+  | "delayed"
+  | "Completed"
+  | "Exceeded"
+  | "Normal";
+
+type StatusStateType =
+  | "comp"
+  | "incomp"
+  | "ongoing"
+  | "delayed"
+  | "exceeded"
+  | "normal";
+
+interface ChartStackColumnRender {
+  render: any;
+  revit: boolean;
+  layers: any;
+  root: any;
+  chart: any;
+  data: any;
+  buildingLayer?: any;
+  qChart: any;
+  chartCategoryTypes: any;
+  chartCategoryTypeField: any;
+  statusTypename: StatusTypeNamesType[];
+  statusStatename: StatusStateType[];
+  statusArray: any;
+  statusField: any;
+  seriesStatusColor: any;
+  strokeColor: any;
+  strokeWidth: any;
+  view: any;
+  setLayerViewFilter?: any;
+  new_chartIconSize: any;
+  new_axisFontSize: any;
+  chartIconPositionX?: any;
+  chartPaddingRightIconLabel: any;
+  legend: any;
+  updateChartPanelwidth: any;
+}
+
+export async function stackColumnChartRender({
+  render,
+  ...props
+}: ChartStackColumnRender) {
+  Object.assign(render, props);
+  return await render.chartRendererColumn();
+}
+
+//--- Returns query expression
+export const makeQuery = (
+  qValues: any,
+  qFields: any,
+  qExpression?: string,
+  q2Expression?: string,
+) => {
+  const q = new QueryExpressionLayers();
+  q.qValues = qValues;
+  q.qFields = qFields;
+  if (qExpression) q.qExpression = qExpression;
+  if (q2Expression) q.q2Expression = q2Expression;
+  return q;
+};
+
+//------------------------------------------------//
+//                Get as-of-date                  //
+//------------------------------------------------//
 export function thousands_separators(num: any) {
   if (num) {
     const num_parts = num.toString().split(".");
@@ -59,17 +173,9 @@ export function thousands_separators(num: any) {
   }
 }
 
-export function zoomToLayer(layer: any, view: any) {
-  return layer.queryExtent().then((response: any) => {
-    view
-      ?.goTo(response.extent, {
-        //response.extent
-        speedFactor: 2,
-      })
-      .catch((error: any) => {
-        if (error.name !== "AbortError") {
-          console.error(error);
-        }
-      });
+export async function zoomToLayer(layer: any, view: any) {
+  const response = await layer?.queryExtent();
+  view?.goTo(response.extent, { speedFactor: 2 }).catch((error: any) => {
+    if (error.name !== "AbortError") console.error(error);
   });
 }

@@ -14,12 +14,12 @@
   "dependencies": {
     "@arcgis/charts-components": "^5.0.0",
     "@arcgis/core": "^5.1.6",
-    "@arcgis/map-components": "^5.0.0",
-    "@esri/calcite-components": "^5.0.0",
+    "@arcgis/map-components": "^5.1.13",
+    "@esri/calcite-components": "^5.1.1",
     "@tanstack/react-query": "^5.101.2",
-    "chart-stack-column": "^1.0.6",
-    "chart-stack-column-render": "^1.0.2",
-    "query-layers-expression": "^1.0.10",
+    "chart-stack-column": "^1.0.9",
+    "chart-stack-column-render": "^1.0.8",
+    "query-layers-expression": "^1.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

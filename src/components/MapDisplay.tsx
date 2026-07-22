@@ -25,7 +25,6 @@ function MapDisplay() {
 
   return (
     <arcgis-scene
-      // item-id="5ba14f5a7db34710897da0ce2d46d55f"
       basemap="dark-gray-vector"
       ground="world-elevation"
       viewingMode="local"
@@ -34,9 +33,7 @@ function MapDisplay() {
       onarcgisViewReadyChange={(event: any) => {
         setMapView(event.target.id);
       }}
-    >
-      {/* <arcgis-zoom position="top-right"></arcgis-zoom> */}
-    </arcgis-scene>
+    ></arcgis-scene>
   );
 }
 

@@ -1,1 +1,0 @@
-import{ak as i}from"./index-Co51jUEc.js";import{I as n}from"./applyEditsUtils-CGpD_S6L.js";function u(t){return t.map(e=>{const r=e.editedFeatures,a=i.fromJSON(r?.spatialReference);return r?{layerId:e.id,editedFeatures:n(r,a)}:null}).filter(e=>e!==null)}export{u as t};

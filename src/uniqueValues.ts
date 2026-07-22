@@ -23,44 +23,11 @@ export const portalItems = (id: any) => {
   return { id: id, portal: portalItem_url };
 };
 
-export const cpackages = [
-  "All",
-  "S-01",
-  "S-02",
-  "S-03a",
-  "S-03b",
-  "S-03c",
-  "S-04",
-  "S-05",
-  "S-06",
-  "S-07",
-];
-
-export const monitorLists = [
-  "Land Acquisition",
-  "Structure",
-  "Non Land Owner",
-  "Utility Relocation",
-  "Trees",
-  "Viaduct",
-];
-
-// Media parameters
-export const image_scales = [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4];
-export const img_size = 280;
-export const timestamp_field = "timestamp";
-
 //----------------------------------------------//
 //              Chart Parameters                //
 //----------------------------------------------//
 export const chart_width = "26vw";
 export const chart_box_width = 250;
-
-export const construction_status = [
-  "To be Constructed",
-  "Under Construction",
-  "Completed",
-];
 
 // Chart and chart label color
 export const primaryLabelColor = "#9ca3af";

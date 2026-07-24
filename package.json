@@ -17,8 +17,8 @@
     "@arcgis/map-components": "^5.1.13",
     "@esri/calcite-components": "^5.1.1",
     "@tanstack/react-query": "^5.101.2",
-    "chart-stack-column": "^1.0.9",
-    "chart-stack-column-render": "^1.0.8",
+    "chart-stack-column": "^1.0.10",
+    "chart-stack-column-render": "^1.0.9",
     "query-layers-expression": "^1.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

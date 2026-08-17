@@ -12,8 +12,17 @@ import { defineActions } from "../uniqueValues";
 function ActionPanel() {
   const shellPanel: any = document.getElementById("left-shell-panel");
 
+  //-----------------------------------------
+  //   Define active & next widget states
+  //-----------------------------------------
   const [activeWidget, setActiveWidget] = useState<any>(null);
   const [nextWidget, setNextWidget] = useState<any>(null);
+
+  //--- Render only when selected
+  const [hasOpenedBasemaps, setHasOpenedBasemaps] = useState(false);
+  useEffect(() => {
+    if (nextWidget === "basemaps") setHasOpenedBasemaps(true);
+  }, [nextWidget]);
 
   //--- Click action handler function for active & next widget
   const handleActionClick = (event: any) => {
@@ -64,7 +73,6 @@ function ActionPanel() {
             icon="layers"
             text="layers"
             id="layers"
-            //textEnabled={true}
             onClick={handleActionClick}
           ></calcite-action>
 
@@ -97,7 +105,9 @@ function ActionPanel() {
         </calcite-panel>
 
         <calcite-panel heading="Basemaps" data-panel-id="basemaps" hidden>
-          <arcgis-basemap-gallery referenceElement="arcgis-scene"></arcgis-basemap-gallery>
+          {hasOpenedBasemaps ? (
+            <arcgis-basemap-gallery referenceElement="arcgis-scene"></arcgis-basemap-gallery>
+          ) : null}
         </calcite-panel>
 
         <calcite-panel heading="Description" data-panel-id="information" hidden>

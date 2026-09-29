@@ -6,7 +6,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import { thousands_separators } from "../query";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
 import { status_f, status_q, type_f, types_q } from "../uniqueValues";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { legendSetter, rootSetter } from "../chartSetter";
 import type { ChartResponse } from "../interfaceKeys";
 import ChartStackColumnRender from "chart-stack-column-render";
@@ -22,6 +22,7 @@ const Chart = () => {
   const arcgisScene = document.querySelector("arcgis-scene") as ArcgisScene;
   const legendRef = useRef<unknown | any | undefined>({});
   const chartRef = useRef<unknown | any | undefined>({});
+  const rendererRef = useRef<ChartStackColumnRender | null>(null);
   const chartID = "monitoring-bar";
 
   const q1 = new QueryExpressionLayers({});
@@ -59,6 +60,8 @@ const Chart = () => {
         totale: totale,
       };
     },
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
   });
   const chartData = data?.chartData || [];
   const totaln = data?.totaln || 0;
@@ -78,14 +81,36 @@ const Chart = () => {
   const chartBorderLineColor = "#00c5ff";
   const chartBorderLineWidth = 0.4;
 
-  const new_fontSize = chartPanelwidth / 20;
-  const new_valueSize = new_fontSize * 1.7;
-  const new_chartIconSize = chartPanelwidth * 0.07;
-  const new_axisFontSize = chartPanelwidth * 0.036;
-  const new_imageSize = chartPanelwidth * 0.053;
+  const fontSize = chartPanelwidth / 20;
+  const valueSize = fontSize * 1.7;
+  const chartIconSize = chartPanelwidth * 0.07;
+  const axisFontSize = chartPanelwidth * 0.036;
+  const imageSize = chartPanelwidth * 0.053;
 
+  //--- Keep click-handler-relevant values fresh without rebuilding the
+  //    chart. view lives here too (not passed statically to the
+  //    renderer) since arcgis-scene's view may not be ready on first
+  //    mount.
+  const configBaseArgs = {
+    revit: false,
+    layers: [monitorPointLayer],
+    buildingLayer: undefined,
+    chartCategoryTypeField: type_f,
+    where: q1,
+    status_field: status_f,
+    view: arcgisScene?.view,
+  };
+
+  const configRef = useRef({ ...configBaseArgs });
+  useEffect(() => {
+    configRef.current = { ...configBaseArgs };
+  }, [data, status_f, arcgisScene]);
+
+  //---  Column Chart Renderer — created ONCE (mount only)
   useEffect(() => {
     const root = rootSetter({ chartID: chartID });
+    root.setThemes([]);
+
     const chart = root.container.children.push(
       am5xy.XYChart.new(root, {
         panX: false,
@@ -106,8 +131,8 @@ const Chart = () => {
     chartRef.current = chart;
 
     const legend = legendSetter({
-      chart: chart,
-      root: root,
+      chart,
+      root,
       centerX: 50,
       centerY: 50,
       x: 60,
@@ -117,40 +142,55 @@ const Chart = () => {
     });
     legendRef.current = legend;
 
-    //--- chart renderer
-    new ChartStackColumnRender({
-      revit: false,
-      layers: [monitorPointLayer],
+    //--- NOTE: no `view` here — it's read live from configRef.current
+    //    inside chartrender.ts, since arcgis-scene may not have a
+    //    ready `.view` yet at this point.
+    const renderer = new ChartStackColumnRender({
       root,
       chart,
-      data: chartData,
-      buildingLayer: undefined,
-      where: q1,
+      data: [],
+      configRef,
       chartCategoryTypes: types_q,
-      chartCategoryTypeField: type_f,
       statusTypename: ["Exceeded", "Normal"],
       statusStatename: ["exceeded", "normal"],
       statusArray: status_q,
-      statusField: status_f,
       seriesStatusColor: status_q.map((c: any) => c.color),
       strokeColor: chartBorderLineColor,
       strokeWidth: chartBorderLineWidth,
-      view: arcgisScene?.view,
-      new_chartIconSize,
-      new_axisFontSize,
+      chartIconSize,
+      axisFontSize,
       chartIconPositionX,
       chartPaddingRightIconLabel,
       legend,
       updateChartPanelwidth: setChartPanelwidth,
-    }).chartRendererColumn();
-
-    chart.appear(1000, 100);
+    });
+    rendererRef.current = renderer;
+    renderer.chartRendererColumn();
 
     return () => {
       root.dispose();
+      rendererRef.current = null;
     };
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  //--- Push new data / inner value / affected-area figures into the
+  //    already-mounted chart. No dispose, no rebuild -> no blink.
+  //    NOTE: affectedAreaValue is NOT called here directly — it's
+  //    registered once inside chartrender.ts and reads live data via
+  //    closures, which updateData() keeps in sync. Calling it here on
+  //    every render would both miss the first paint and stack
+  //    duplicate adapters.
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    if (!renderer || !chartPanelwidth) return; // wait for a real width
+
+    //--- Sizes are captured at construction, so refresh them here
+    renderer.chartIconSize = chartIconSize;
+    renderer.axisFontSize = axisFontSize;
+
+    renderer.updateData(chartData);
+  }, [chartData, chartPanelwidth]);
   const primaryLabelColor = "#9ca3af";
   const valueLabelColor = "#d1d5db";
 
@@ -184,15 +224,15 @@ const Chart = () => {
                 : "https://EijiGorilla.github.io/Symbols/DemolishComplete_v2.png"
             }
             alt="Land Logo"
-            height={`${new_imageSize}%`}
-            width={`${new_imageSize}%`}
+            height={`${imageSize}%`}
+            width={`${imageSize}%`}
             style={{ paddingTop: "30px", paddingLeft: "15px" }}
           />
           <dl style={{ alignItems: "center", marginRight: "20px" }}>
             <dt
               style={{
                 color: primaryLabelColor,
-                fontSize: `${new_fontSize}px`,
+                fontSize: `${fontSize}px`,
               }}
             >
               TOTAL EXCEEDED
@@ -200,7 +240,7 @@ const Chart = () => {
             <dd
               style={{
                 color: valueLabelColor,
-                fontSize: `${new_valueSize}px`,
+                fontSize: `${valueSize}px`,
                 fontWeight: "bold",
                 fontFamily: "calibri",
                 lineHeight: "1.2",
@@ -209,7 +249,7 @@ const Chart = () => {
             >
               {thousands_separators(totale)}
             </dd>
-            <div style={{ fontSize: `${new_valueSize}*0.5px` }}>
+            <div style={{ fontSize: `${valueSize}*0.5px` }}>
               ({thousands_separators(totaln)})
             </div>
           </dl>

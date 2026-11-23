@@ -1,0 +1,1 @@
+const t=Symbol("ImageElementInstance"),e=Symbol("VideoElementInstance");function o(n){return typeof n=="object"&&!!n&&t in n}function c(n){return typeof n=="object"&&!!n&&e in n}function r(n){return o(n)||c(n)}export{t as e,r as i,c as r,e as t};

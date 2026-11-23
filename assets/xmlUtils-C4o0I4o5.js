@@ -1,0 +1,1 @@
+function t(f,o){if(f&&o){for(let e of f.children)if(e.localName in o){let l=o[e.localName];if(typeof l=="function"){let i=l(e);i&&t(e,i)}else t(e,l)}}}function*c(f,o){for(let e of f.children)if(e.localName in o){let l=o[e.localName];typeof l=="function"?yield l(e):yield*c(e,l)}}export{t as e,c as t};

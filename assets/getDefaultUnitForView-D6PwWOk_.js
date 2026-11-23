@@ -1,0 +1,1 @@
+import{C as i,fD as l}from"./index-BfFZtmsR.js";function s(t){let e="metric";if(!t)return e;let{map:r}=t,a=(r&&"portalItem"in r?r.portalItem?.portal:null)??i.getDefault();switch(a.user?.units??a.units){case e:return e;case"english":return"imperial"}return l(t.spatialReference)??e}export{s as n};

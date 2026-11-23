@@ -1,0 +1,1 @@
+class c{constructor(t,s,e){this.objectId=t,this.target=s,this.distance=e}}class d extends c{constructor(t,s,e){super(t,s,e),this.type="vertex"}}class o extends c{constructor(t,s,e,i,h,n=!1,a=null){super(t,s,e),this.start=i,this.end=h,this.draped=n,this.curve=a,this.type="edge"}}export{o as n,d as t};
